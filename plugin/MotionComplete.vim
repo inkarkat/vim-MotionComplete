@@ -59,46 +59,7 @@ function! ExtractText( startPos, endPos )
     call setpos('.', l:save_cursor)
     return l:text
 endfunction
-function! s:HasMatchesInCurrentWindow( pattern )
-    "TODO
-    return 0
-endfunction
-function! s:HasMatchesInOtherWindows( pattern )
-    let l:hasMatches = 0
-    let l:searchedBuffers = { bufnr('') : 1 }
-    let l:originalWinNr = winnr()
-
-    for l:winNr in range(1, winnr('$'))
-	execute l:winNr 'wincmd w'
-
-	if ! has_key( l:searchedBuffers, bufnr('') )
-	    if s:HasMatchesInCurrentWindow( a:pattern )
-		let l:hasMatches = 1
-		break
-	    endif
-	    let l:searchedBuffers[ bufnr('') ] = 1
-	endif
-    endfor
-
-    execute l:originalWinNr 'wincmd w'
-    return l:hasMatches
-endfunction
 function! s:LocateStartCol()
-    " This completion method is probably only used for longer matches, as
-    " invoking this completion method with the querying of the {motion} isn't
-    " very fast. For motions that cover many words or entire sentences, using
-    " just the keyword before the cursor doesn't provide enough context. 
-    " Thus, we want to narrow down the results by using as much context before
-    " the cursor as possible. 
-
-    " Locate the start of the base. 
-    let l:startCol = searchpos('\S\+\s*\%#', 'bn', line('.'))[1]
-    if l:startCol == 0
-	let l:startCol = col('.')
-    endif
-"****D echomsg '****' l:startCol col('.') col('$')
-    "let l:base = strpart(getline('.'), l:startCol - 1, (col('.') - l:startCol))
-"****D echomsg '****' l:base
     return l:startCol
 endfunction
 
@@ -115,7 +76,23 @@ function! s:Process( match )
 endfunction
 function! s:MotionComplete( findstart, base )
     if a:findstart
-	return s:LocateStartCol() - 1 " Return byte index, not column. 
+	" This completion method is probably only used for longer matches, as
+	" invoking this completion method with the querying of the {motion} isn't
+	" very fast. For motions that cover many words or entire sentences, using
+	" just the keyword before the cursor may result in an empty base, which
+	" isn't helpful for this completion method. So instead, we include
+	" mandatory keyword characters followed by optional non-keyword
+	" characters before the cursor. 
+
+	" Locate the start of the base. 
+	let l:startCol = searchpos('\k\+\%(\k\@!.\)*\%#', 'bn', line('.'))[1]
+	if l:startCol == 0
+	    let l:startCol = col('.')
+	endif
+"****D echomsg '****' l:startCol col('.') col('$')
+"****D let l:base = strpart(getline('.'), l:startCol - 1, (col('.') - l:startCol))
+"****D echomsg '****' l:base
+	return l:startCol - 1 " Return byte index, not column. 
     else
 	let l:options = {}
 	let l:options.complete = s:GetCompleteOption()
