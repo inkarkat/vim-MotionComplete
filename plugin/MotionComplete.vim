@@ -35,6 +35,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	004	19-Aug-2008	<Tab> characters now replaced with 'listchars'
+"				option value. 
+"				BF: Completion capture cap cut off at beginning,
+"				not at end. 
 "	003	18-Aug-2008	Made /pattern/ and ?pattern? motions work. 
 "				Added limits for search scope and capture
 "				length. 
@@ -98,7 +102,7 @@ function! MotionComplete_ExtractText( startPos, endPos )
 
     " Capture a maximum number of characters; too many won't fit comfortably
     " into the completion display, anyway. 
-    let l:text = strpart(@@, byteidx(@@, g:MotionComplete_maxCaptureLength))
+    let l:text = strpart(@@, 0, byteidx(@@, g:MotionComplete_maxCaptureLength))
 
     let @@ = l:save_register
     let &l:foldenable = l:save_foldenable
@@ -126,10 +130,16 @@ function! s:GetBaseText()
     return strpart(getline('.'), l:startCol - 1, (col('.') - l:startCol))
 endfunction
 
+function! s:TabReplacement()
+    if ! exists('s:tabReplacement')
+	let s:tabReplacement = matchstr(&listchars, 'tab:\zs..')
+	let s:tabReplacement = (empty(s:tabReplacement) ? '^I' : s:tabReplacement)
+    endif
+    return s:tabReplacement
+endfunction
 function! s:Process( match )
-    " Shorten the match abbreviation; also change (invisible) <Tab> characters
-    " to 2 spaces. 
-    let l:abbreviatedMatch = substitute(a:match.word, '\t', '  ', 'g')
+    " Shorten the match abbreviation; also change (invisible) <Tab> characters. 
+    let l:abbreviatedMatch = substitute(a:match.word, '\t', s:TabReplacement(), 'g')
     let l:maxDisplayLen = &columns / 2
     if len(l:abbreviatedMatch) > l:maxDisplayLen
 	let a:match.abbr = EchoWithoutScrolling#TruncateTo( l:abbreviatedMatch, l:maxDisplayLen )
