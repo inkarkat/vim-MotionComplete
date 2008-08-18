@@ -67,7 +67,7 @@ function! s:GetCompleteOption()
     return (exists('b:MotionComplete_complete') ? b:MotionComplete_complete : g:MotionComplete_complete)
 endfunction
 
-function! MotionComplete_ExtractText( startPos, endPos )
+function! MotionComplete_ExtractText( startPos, endPos, matchObj )
     let l:save_cursor = getpos('.')
     let l:save_foldenable = &l:foldenable
     let l:save_register = @@
@@ -102,7 +102,13 @@ function! MotionComplete_ExtractText( startPos, endPos )
 
     " Capture a maximum number of characters; too many won't fit comfortably
     " into the completion display, anyway. 
-    let l:text = strpart(@@, 0, byteidx(@@, g:MotionComplete_maxCaptureLength))
+    if byteidx(@@, g:MotionComplete_maxCaptureLength + 1) == -1
+	let l:text = @@
+    else
+	let l:text = strpart(@@, 0, byteidx(@@, g:MotionComplete_maxCaptureLength))
+	" Add truncation note to match object. 
+	let a:matchObj.menu = '(truncated)' . (! empty(get(a:matchObj, 'menu', '')) ? ', ' . a:matchObj.menu : '')
+    endif
 
     let @@ = l:save_register
     let &l:foldenable = l:save_foldenable
