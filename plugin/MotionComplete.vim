@@ -39,6 +39,8 @@
 "				option value. 
 "				BF: Completion capture cap cut off at beginning,
 "				not at end. 
+"				Completion menu now shows truncation note. 
+"				Refactored MotionComplete_ExtractText(). 
 "	003	18-Aug-2008	Made /pattern/ and ?pattern? motions work. 
 "				Added limits for search scope and capture
 "				length. 
@@ -67,6 +69,33 @@ function! s:GetCompleteOption()
     return (exists('b:MotionComplete_complete') ? b:MotionComplete_complete : g:MotionComplete_complete)
 endfunction
 
+function! s:GetMotion( line )
+    " A '/pattern' or '?pattern' motion must be concluded with <CR> and limited
+    " in scope to avoid huge captures. 
+    if s:motion !~# '^[/?]'
+	return s:motion
+    else
+	" Automatically limit the search scope to the next n lines to avoid that
+	" HUGE amounts of text are yanked. 
+	let l:motionType = strpart(s:motion, 0, 1)
+	let [l:boundLow, l:boundHigh] = (l:motionType == '/' ? [a:line - 1, a:line + g:MotionComplete_searchScopeLines] : [max([l:line - g:MotionComplete_searchScopeLines, 0]), l:line + 1])
+	let l:scopeLimit = '\%>' . l:boundLow . 'l\%<' . l:boundHigh . 'l'
+
+	return l:motionType . l:scopeLimit . strpart(s:motion, 1) . "\<CR>"
+    endif
+endfunction
+function! s:CaptureText( matchObj )
+    " Capture a maximum number of characters; too many won't fit comfortably
+    " into the completion display, anyway. 
+    if byteidx(@@, g:MotionComplete_maxCaptureLength + 1) == -1
+	return @@
+    else
+	" Add truncation note to match object. 
+	let a:matchObj.menu = '(truncated)' . (! empty(get(a:matchObj, 'menu', '')) ? ', ' . a:matchObj.menu : '')
+
+	return strpart(@@, 0, byteidx(@@, g:MotionComplete_maxCaptureLength))
+    endif
+endfunction
 function! MotionComplete_ExtractText( startPos, endPos, matchObj )
     let l:save_cursor = getpos('.')
     let l:save_foldenable = &l:foldenable
@@ -80,35 +109,12 @@ function! MotionComplete_ExtractText( startPos, endPos, matchObj )
     " Position the cursor at the start of the match. 
     call setpos('.', [0, a:startPos[0], a:startPos[1], 0])
 
-    let l:motion = s:motion
-    " A '/pattern' or '?pattern' motion must be concluded with <CR> and limited
-    " in scope to avoid huge captures. 
-    if l:motion =~# '^[/?]'
-	" Automatically limit the search scope to the next n lines to avoid that
-	" HUGE amounts of text are yanked. 
-	let l:motionType = strpart(l:motion, 0, 1)
-	let l:line = a:startPos[0]
-	let [l:boundLow, l:boundHigh] = (l:motionType == '/' ? [l:line - 1, l:line + g:MotionComplete_searchScopeLines] : [max([l:line - g:MotionComplete_searchScopeLines, 0]), l:line + 1])
-	let l:scopeLimit = '\%>' . l:boundLow . 'l\%<' . l:boundHigh . 'l'
-
-	let l:motion =  l:motionType . l:scopeLimit . strpart(l:motion, 1) . "\<CR>"
-"****D echomsg '////' l:motion
-    endif
-
     " Yank with the supplied s:motion. 
     " No 'normal!' here, we want to allow user re-mappings and custom motions. 
     " 'silent!' is used to avoid the error beep in case s:motion is invalid. 
-    execute 'silent! normal y' . l:motion
+    execute 'silent! normal y' . s:GetMotion(a:startPos[0])
 
-    " Capture a maximum number of characters; too many won't fit comfortably
-    " into the completion display, anyway. 
-    if byteidx(@@, g:MotionComplete_maxCaptureLength + 1) == -1
-	let l:text = @@
-    else
-	let l:text = strpart(@@, 0, byteidx(@@, g:MotionComplete_maxCaptureLength))
-	" Add truncation note to match object. 
-	let a:matchObj.menu = '(truncated)' . (! empty(get(a:matchObj, 'menu', '')) ? ', ' . a:matchObj.menu : '')
-    endif
+    let l:text = s:CaptureText(a:matchObj)
 
     let @@ = l:save_register
     let &l:foldenable = l:save_foldenable
