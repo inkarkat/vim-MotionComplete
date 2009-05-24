@@ -128,18 +128,27 @@ function! s:LocateStartCol()
     " just the keyword before the cursor may result in an empty base, which
     " isn't helpful for this completion method. So instead, we include
     " mandatory keyword characters followed by optional non-keyword
-    " characters before the cursor. 
+    " characters before the cursor.
+    " Alternatively, the user can pre-select the base (via select or visual
+    " mode) before invoking the completion. This ensures that the best context
+    " for completion is chosen. 
 
-    " Locate the start of the base. 
-    let l:startCol = searchpos('\k\+\%(\k\@!.\)*\%#', 'bn', line('.'))[1]
-    if l:startCol == 0
-	let l:startCol = col('.')
+    if s:isSelectedBase
+	" User explicitly specified base via active selection. 
+	let l:startCol = col("'<")
+    else
+	" Locate the start of the base via keyword(s) before the cursor. 
+	let l:startCol = searchpos('\k\+\%(\k\@!.\)*\%#', 'bn', line('.'))[1]
+	if l:startCol == 0
+	    let l:startCol = col('.')
+	endif
     endif
+
     return l:startCol
 endfunction
 function! s:GetBaseText()
     let l:startCol = s:LocateStartCol()
-    return strpart(getline('.'), l:startCol - 1, (col('.') - l:startCol))
+    return strpart(getline('.'), l:startCol - 1, (col((s:isSelectedBase ? "'>" : '.')) - l:startCol))
 endfunction
 
 function! s:TabReplacement()
@@ -177,12 +186,15 @@ function! s:MotionComplete( findstart, base )
     endif
 endfunction
 
-function! s:MotionInput()
+function! s:MotionInput(isSelectedBase)
+    let s:isSelectedBase = a:isSelectedBase
+
     call inputsave()
     let s:motion = input('Motion to complete from "' . s:GetBaseText() . '": ')
     call inputrestore()
 endfunction
 
-inoremap <C-x><C-m> <C-\><C-o>:call <SID>MotionInput()<Bar>set completefunc=<SID>MotionComplete<CR><C-x><C-u>
+inoremap <silent> <C-x><C-m> <C-\><C-o>:call <SID>MotionInput(0)<Bar>set completefunc=<SID>MotionComplete<CR><C-x><C-u>
+vnoremap <silent> <C-x><C-m> :<C-u>call <SID>MotionInput(1)<bar>set completefunc=<SID>MotionComplete<CR>gvs<C-r><C-o>"<C-x><C-u>
 
 " vim: set sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
