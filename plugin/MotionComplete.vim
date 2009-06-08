@@ -6,17 +6,25 @@
 "   line), so one has to repeat |i_CTRL-X_CTRL-N| to complete the following
 "   words. For longer completions, this is slow, especially because you
 "   sometimes have to choose from multiple choices. 
-"   The completion provided by this plugin assumes that you know a VIM motion
+"   The completion provided by this plugin assumes that you know a Vim motion
 "   (e.g. '3e', ')' or '/bar/e') which covers the text you want completed. When
-"   you invoke the completion, completion base (i.e. the keyword before the
-"   cursor) will be presented and the motion to cover the completion text will
-"   be queried. Then, the list of completion candidates will be prepared and
-"   selected in the usual way. 
+"   you invoke the completion, completion base (the keyword before the
+"   cursor, or the currently selected text) will be presented and the motion to
+"   cover the completion text will be queried. Then, the list of completion
+"   candidates will be prepared and selected in the usual way. 
 "
 " USAGE:
-" i_CTRL-X_CTRL-M	First query for {motion} (press <Enter> to conclude or
-"			<Esc> to cancel), then finds matches starting with the
-"			keyword before the cursor and covering {motion}. 
+"							       *i_CTRL-X_CTRL-M*
+" CTRL-X CTRL-M		The completion first queries for {motion} (press <Enter>
+"			to conclude), then finds matches starting with the
+"			keyword before the cursor, covering {motion}. 
+"							       *v_CTRL-X_CTRL-M*
+" {Visual}CTRL-X CTRL-M	The completion first queries for {motion} (press <Enter>
+"			to conclude), then finds matches starting with the
+"			selected text, covering {motion}. 
+"			Use this to define the completion base text (quickly
+"			done from insert mode via [CTRL-]SHIFT-<Left>) for
+"			better matches. 
 "
 " INSTALLATION:
 " DEPENDENCIES:
@@ -47,7 +55,7 @@
 "	002	17-Aug-2008	Completed implementation. 
 "	001	13-Aug-2008	file creation
 
-" Avoid installing twice or when in unsupported VIM version. 
+" Avoid installing twice or when in unsupported Vim version. 
 if exists('g:loaded_MotionComplete') || (v:version < 700)
     finish
 endif
@@ -179,8 +187,11 @@ function! s:MotionComplete( findstart, base )
 	" Find matches starting with a:base; no further restriction is placed;
 	" the s:motion will extract the rest, starting from the beginning of
 	" a:base. 
+	" In case of automatic base selection via keyword, matches must start at
+	" a word border, in case of a user-selected base, matches can start
+	" anywhere. 
 	let l:matches = []
-	call CompleteHelper#FindMatches( l:matches, '\V\<' . escape(a:base, '\'), l:options )
+	call CompleteHelper#FindMatches( l:matches, '\V' . (s:isSelectedBase ? '' : '\<') . escape(a:base, '\'), l:options )
 	call map( l:matches, 's:Process(v:val)')
 	return l:matches
     endif
@@ -195,6 +206,8 @@ function! s:MotionInput(isSelectedBase)
 endfunction
 
 inoremap <silent> <C-x><C-m> <C-\><C-o>:call <SID>MotionInput(0)<Bar>set completefunc=<SID>MotionComplete<CR><C-x><C-u>
-vnoremap <silent> <C-x><C-m> :<C-u>call <SID>MotionInput(1)<bar>set completefunc=<SID>MotionComplete<CR>gvs<C-r><C-o>"<C-x><C-u>
+nnoremap <expr> <SID>ReenterInsertMode (col("'>") == (col('$')) ? 'a' : 'i')
+xnoremap <silent> <script> <C-x><C-m>      :<C-u>call <SID>MotionInput(1)<Bar>set completefunc=<SID>MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
+snoremap <silent> <script> <C-x><C-m> <C-g>:<C-u>call <SID>MotionInput(1)<Bar>set completefunc=<SID>MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
 
 " vim: set sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
