@@ -10,9 +10,18 @@
 "   (e.g. '3e', ')' or '/bar/e') which covers the text you want completed. When
 "   you invoke the completion, completion base (the keyword before the
 "   cursor, or the currently selected text) will be presented and the motion to
-"   cover the completion text will be queried. Then, the list of completion
-"   candidates will be prepared and selected in the usual way. 
+"   cover the completion text (including the completion base) will be queried.
+"   Then, the list of completion candidates will be prepared and selected in the
+"   usual way. 
 "
+" ILLUSTRATION:
+"   A quick| <- cursor, just triggered motion completion. 
+"   
+"   (Somewhere else, a match:) 
+"       |---| <- completion base
+"   The quick brown fox jumps over the lazy dog. 
+"       |----------- "5w" --------| <- completion
+"   
 " USAGE:
 "							       *i_CTRL-X_CTRL-M*
 " CTRL-X CTRL-M		The completion first queries for {motion} (press <Enter>
@@ -37,12 +46,13 @@
 " KNOWN PROBLEMS:
 " TODO:
 "
-" Copyright: (C) 2008 by Ingo Karkat
+" Copyright: (C) 2008-2009 by Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	005	09-Jun-2009	Made mapping configurable. 
 "	004	19-Aug-2008	<Tab> characters now replaced with 'listchars'
 "				option value. 
 "				BF: Completion capture cap cut off at beginning,
@@ -205,9 +215,19 @@ function! s:MotionInput(isSelectedBase)
     call inputrestore()
 endfunction
 
-inoremap <silent> <C-x><C-m> <C-\><C-o>:call <SID>MotionInput(0)<Bar>set completefunc=<SID>MotionComplete<CR><C-x><C-u>
+inoremap <silent> <Plug>MotionComplete <C-\><C-o>:call <SID>MotionInput(0)<Bar>set completefunc=<SID>MotionComplete<CR><C-x><C-u>
 nnoremap <expr> <SID>ReenterInsertMode (col("'>") == (col('$')) ? 'a' : 'i')
-xnoremap <silent> <script> <C-x><C-m>      :<C-u>call <SID>MotionInput(1)<Bar>set completefunc=<SID>MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
-snoremap <silent> <script> <C-x><C-m> <C-g>:<C-u>call <SID>MotionInput(1)<Bar>set completefunc=<SID>MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
+xnoremap <silent> <script> <Plug>MotionComplete      :<C-u>call <SID>MotionInput(1)<Bar>set completefunc=<SID>MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
+snoremap <silent> <script> <Plug>MotionComplete <C-g>:<C-u>call <SID>MotionInput(1)<Bar>set completefunc=<SID>MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
+
+if ! hasmapto('<Plug>MotionComplete', 'i')
+    imap <C-x><C-m> <Plug>MotionComplete
+endif
+if ! hasmapto('<Plug>MotionComplete', 'x')
+    xmap <C-x><C-m> <Plug>MotionComplete
+endif
+if ! hasmapto('<Plug>MotionComplete', 's')
+    smap <C-x><C-m> <Plug>MotionComplete
+endif
 
 " vim: set sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
