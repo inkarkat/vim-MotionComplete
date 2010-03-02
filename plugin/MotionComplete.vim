@@ -52,6 +52,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	006	07-Aug-2009	Using a map-expr instead of i_CTRL-O to set
+"				'completefunc', as the temporary leave of insert
+"				mode caused a later repeat via '.' to only
+"				insert the completed fragment, not the entire
+"				inserted text.  
 "	005	09-Jun-2009	Made mapping configurable. 
 "	004	19-Aug-2008	<Tab> characters now replaced with 'listchars'
 "				option value. 
@@ -186,7 +191,7 @@ function! s:Process( match )
 
     return a:match
 endfunction
-function! s:MotionComplete( findstart, base )
+function! MotionComplete#MotionComplete( findstart, base )
     if a:findstart
 	return s:LocateStartCol() - 1 " Return byte index, not column. 
     else
@@ -215,7 +220,12 @@ function! s:MotionInput(isSelectedBase)
     call inputrestore()
 endfunction
 
-inoremap <silent> <Plug>MotionComplete <C-\><C-o>:call <SID>MotionInput(0)<Bar>set completefunc=<SID>MotionComplete<CR><C-x><C-u>
+function! s:MotionCompleteExpr()
+    call s:MotionInput(0)
+    set completefunc=MotionComplete#MotionComplete
+    return "\<C-x>\<C-u>"
+endfunction
+inoremap <script> <expr> <Plug>MotionComplete <SID>MotionCompleteExpr()
 nnoremap <expr> <SID>ReenterInsertMode (col("'>") == (col('$')) ? 'a' : 'i')
 xnoremap <silent> <script> <Plug>MotionComplete      :<C-u>call <SID>MotionInput(1)<Bar>set completefunc=<SID>MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
 snoremap <silent> <script> <Plug>MotionComplete <C-g>:<C-u>call <SID>MotionInput(1)<Bar>set completefunc=<SID>MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
