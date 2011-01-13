@@ -24,7 +24,7 @@
 "   
 " USAGE:
 "							       *i_CTRL-X_CTRL-M*
-" CTRL-X CTRL-M		The completion first queries for {motion} (press <Enter>
+" <i_CTRL-X_CTRL-M>	The completion first queries for {motion} (press <Enter>
 "			to conclude), then finds matches starting with the
 "			keyword before the cursor, covering {motion}. 
 "							       *v_CTRL-X_CTRL-M*
@@ -52,6 +52,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	007	03-Mar-2010	BUG: Visual / select mode mappings still used
+"				old <SID>MotionComplete. 
 "	006	07-Aug-2009	Using a map-expr instead of i_CTRL-O to set
 "				'completefunc', as the temporary leave of insert
 "				mode caused a later repeat via '.' to only
@@ -227,8 +229,8 @@ function! s:MotionCompleteExpr()
 endfunction
 inoremap <script> <expr> <Plug>MotionComplete <SID>MotionCompleteExpr()
 nnoremap <expr> <SID>ReenterInsertMode (col("'>") == (col('$')) ? 'a' : 'i')
-xnoremap <silent> <script> <Plug>MotionComplete      :<C-u>call <SID>MotionInput(1)<Bar>set completefunc=<SID>MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
-snoremap <silent> <script> <Plug>MotionComplete <C-g>:<C-u>call <SID>MotionInput(1)<Bar>set completefunc=<SID>MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
+xnoremap <silent> <script> <Plug>MotionComplete      :<C-u>call <SID>MotionInput(1)<Bar>set completefunc=MotionComplete#MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
+snoremap <silent> <script> <Plug>MotionComplete <C-g>:<C-u>call <SID>MotionInput(1)<Bar>set completefunc=MotionComplete#MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
 
 if ! hasmapto('<Plug>MotionComplete', 'i')
     imap <C-x><C-m> <Plug>MotionComplete
