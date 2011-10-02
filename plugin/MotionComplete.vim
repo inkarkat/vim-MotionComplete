@@ -46,12 +46,14 @@
 " KNOWN PROBLEMS:
 " TODO:
 "
-" Copyright: (C) 2008-2009 by Ingo Karkat
+" Copyright: (C) 2008-2011 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	008	14-Jan-2011	FIX: Text extraction clobbered the blockwise
+"				mode of the unnamed register. 
 "	007	03-Mar-2010	BUG: Visual / select mode mappings still used
 "				old <SID>MotionComplete. 
 "	006	07-Aug-2009	Using a map-expr instead of i_CTRL-O to set
@@ -123,13 +125,18 @@ function! s:CaptureText( matchObj )
 endfunction
 function! MotionComplete_ExtractText( startPos, endPos, matchObj )
     let l:save_cursor = getpos('.')
-    let l:save_foldenable = &l:foldenable
-    let l:save_register = @@
-    let @@ = ''
 
     " Yanking in a closed fold would yield much additional text, so disable
     " folding temporarily. 
+    let l:save_foldenable = &l:foldenable
     let &l:foldenable = 0
+
+    let l:save_clipboard = &clipboard
+    set clipboard= " Avoid clobbering the selection and clipboard registers. 
+
+    let l:save_reg = getreg('"')
+    let l:save_regmode = getregtype('"')
+    let @@ = ''
 
     " Position the cursor at the start of the match. 
     call setpos('.', [0, a:startPos[0], a:startPos[1], 0])
@@ -141,7 +148,8 @@ function! MotionComplete_ExtractText( startPos, endPos, matchObj )
 
     let l:text = s:CaptureText(a:matchObj)
 
-    let @@ = l:save_register
+    call setreg('"', l:save_reg, l:save_regmode)
+    let &clipboard = l:save_clipboard
     let &l:foldenable = l:save_foldenable
     call setpos('.', l:save_cursor)
     return l:text
