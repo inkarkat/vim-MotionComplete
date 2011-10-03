@@ -235,19 +235,19 @@ function! s:MotionCompleteExpr()
     set completefunc=MotionComplete#MotionComplete
     return "\<C-x>\<C-u>"
 endfunction
-inoremap <script> <expr> <Plug>MotionComplete <SID>MotionCompleteExpr()
+inoremap <script> <expr> <Plug>(MotionComplete) <SID>MotionCompleteExpr()
 nnoremap <expr> <SID>ReenterInsertMode (col("'>") == (col('$')) ? 'a' : 'i')
-xnoremap <silent> <script> <Plug>MotionComplete      :<C-u>call <SID>MotionInput(1)<Bar>set completefunc=MotionComplete#MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
-snoremap <silent> <script> <Plug>MotionComplete <C-g>:<C-u>call <SID>MotionInput(1)<Bar>set completefunc=MotionComplete#MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
+xnoremap <silent> <script> <Plug>(MotionComplete)      :<C-u>call <SID>MotionInput(1)<Bar>set completefunc=MotionComplete#MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
+snoremap <silent> <script> <Plug>(MotionComplete) <C-g>:<C-u>call <SID>MotionInput(1)<Bar>set completefunc=MotionComplete#MotionComplete<CR>`><SID>ReenterInsertMode<C-x><C-u>
 
-if ! hasmapto('<Plug>MotionComplete', 'i')
-    imap <C-x><C-m> <Plug>MotionComplete
+if ! hasmapto('<Plug>(MotionComplete)', 'i')
+    imap <C-x><C-m> <Plug>(MotionComplete)
 endif
-if ! hasmapto('<Plug>MotionComplete', 'x')
-    xmap <C-x><C-m> <Plug>MotionComplete
+if ! hasmapto('<Plug>(MotionComplete)', 'x')
+    xmap <C-x><C-m> <Plug>(MotionComplete)
 endif
-if ! hasmapto('<Plug>MotionComplete', 's')
-    smap <C-x><C-m> <Plug>MotionComplete
+if ! hasmapto('<Plug>(MotionComplete)', 's')
+    smap <C-x><C-m> <Plug>(MotionComplete)
 endif
 
 " vim: set sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
