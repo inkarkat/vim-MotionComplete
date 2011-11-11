@@ -52,6 +52,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	009	04-Oct-2011	Move s:Process() to CompleteHelper#Abbreviate(). 
 "	008	14-Jan-2011	FIX: Text extraction clobbered the blockwise
 "				mode of the unnamed register. 
 "	007	03-Mar-2010	BUG: Visual / select mode mappings still used
@@ -184,23 +185,6 @@ function! s:GetBaseText()
     return strpart(getline('.'), l:startCol - 1, (col((s:isSelectedBase ? "'>" : '.')) - l:startCol))
 endfunction
 
-function! s:TabReplacement()
-    if ! exists('s:tabReplacement')
-	let s:tabReplacement = matchstr(&listchars, 'tab:\zs..')
-	let s:tabReplacement = (empty(s:tabReplacement) ? '^I' : s:tabReplacement)
-    endif
-    return s:tabReplacement
-endfunction
-function! s:Process( match )
-    " Shorten the match abbreviation; also change (invisible) <Tab> characters. 
-    let l:abbreviatedMatch = substitute(a:match.word, '\t', s:TabReplacement(), 'g')
-    let l:maxDisplayLen = &columns / 2
-    if len(l:abbreviatedMatch) > l:maxDisplayLen
-	let a:match.abbr = EchoWithoutScrolling#TruncateTo( l:abbreviatedMatch, l:maxDisplayLen )
-    endif
-
-    return a:match
-endfunction
 function! MotionComplete#MotionComplete( findstart, base )
     if a:findstart
 	return s:LocateStartCol() - 1 " Return byte index, not column. 
@@ -217,7 +201,7 @@ function! MotionComplete#MotionComplete( findstart, base )
 	" anywhere. 
 	let l:matches = []
 	call CompleteHelper#FindMatches( l:matches, '\V' . (s:isSelectedBase ? '' : '\<') . escape(a:base, '\'), l:options )
-	call map( l:matches, 's:Process(v:val)')
+	call map( l:matches, 'CompleteHelper#Abbreviate(v:val)')
 	return l:matches
     endif
 endfunction
