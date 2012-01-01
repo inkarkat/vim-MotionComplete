@@ -1,5 +1,5 @@
 " MotionComplete.vim: Insert mode completion that completes a text chunk
-" determined by {motion}. 
+" determined by {motion} or text object. 
 "
 " DESCRIPTION:
 "   Most insert mode completions complete only the current word (or an entire
@@ -7,12 +7,12 @@
 "   words. For longer completions, this is slow, especially because you
 "   sometimes have to choose from multiple choices. 
 "   The completion provided by this plugin assumes that you know a Vim motion
-"   (e.g. '3e', ')' or '/bar/e') which covers the text you want completed. When
-"   you invoke the completion, completion base (the keyword before the
-"   cursor, or the currently selected text) will be presented and the motion to
-"   cover the completion text (including the completion base) will be queried.
-"   Then, the list of completion candidates will be prepared and selected in the
-"   usual way. 
+"   (e.g. '3e', ')' or '/bar/e') or text object which covers the text you want
+"   completed. When you invoke the completion, completion base (the keyword
+"   before the cursor, or the currently selected text) will be presented and the
+"   motion to cover the completion text (including the completion base) will be
+"   queried. Then, the list of completion candidates will be prepared and
+"   selected in the usual way. 
 "
 " ILLUSTRATION:
 "   A quick| <- cursor, just triggered motion completion. 
@@ -196,21 +196,34 @@ function! MotionComplete#MotionComplete( findstart, base )
 	" Find matches starting with a:base; no further restriction is placed;
 	" the s:motion will extract the rest, starting from the beginning of
 	" a:base. 
+	" In case of an empty a:base, extraction is started at the beginning of
+	" each keyword. This limits the completion candidates to text fragments
+	" starting with a keyword and ought to help keeping a good match
+	" performance. The latter is especially important for matches with text
+	" objects, where a completion base is given less often, and there are
+	" many duplicate matches (inside the same text object). 
 	" In case of automatic base selection via keyword, matches must start at
 	" a word border, in case of a user-selected base, matches can start
 	" anywhere. 
 	let l:matches = []
-	call CompleteHelper#FindMatches( l:matches, '\V' . (s:isSelectedBase ? '' : '\<') . escape(a:base, '\'), l:options )
+	let l:pattern = '\V' . (s:isSelectedBase && ! empty(a:base) ? '' : '\<') . escape(a:base, '\')
+	call CompleteHelper#FindMatches( l:matches, l:pattern, l:options )
 	call map( l:matches, 'CompleteHelper#Abbreviate(v:val)')
 	return l:matches
     endif
 endfunction
 
-function! s:MotionInput(isSelectedBase)
+function! MotionComplete#SetSelectedBase( isSelectedBase )
     let s:isSelectedBase = a:isSelectedBase
+endfunction
+function! MotionComplete#SetMotion( motion )
+    let s:motion = a:motion
+endfunction
+function! s:MotionInput(isSelectedBase)
+    call MotionComplete#SetMotion(a:isSelectedBase)
 
     call inputsave()
-    let s:motion = input('Motion to complete from "' . s:GetBaseText() . '": ')
+    call MotionComplete#SetMotion(input('Motion to complete from "' . s:GetBaseText() . '": '))
     call inputrestore()
 endfunction
 
