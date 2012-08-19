@@ -1,0 +1,123 @@
+*MotionComplete.txt*    Insert mode completion that completes a text chunk
+determined by {motion} or text object. 
+
+		      MOTION COMPLETE    by Ingo Karkat
+							  *MotionComplete.vim*
+description			|MotionComplete-description|
+usage				|MotionComplete-usage|
+installation			|MotionComplete-installation|
+configuration			|MotionComplete-configuration|
+integration			|MotionComplete-integration|
+limitations			|MotionComplete-limitations|
+known problems			|MotionComplete-known-problems|
+todo				|MotionComplete-todo|
+history				|MotionComplete-history|
+
+==============================================================================
+DESCRIPTION					  *MotionComplete-description*
+
+Most insert mode completions complete only the current word (or an entire
+line), so one has to repeat |i_CTRL-X_CTRL-N| to complete the following words.
+For longer completions, this is slow, especially because you sometimes have to
+choose from multiple choices. 
+The completion provided by this plugin assumes that you know a Vim motion
+(e.g. '3e', ')' or '/bar/e') or text object which covers the text you want
+completed. When you invoke the completion, completion base (the keyword before
+the cursor, or the currently selected text) will be presented and the motion
+to cover the completion text (including the completion base) will be queried.
+Then, the list of completion candidates will be prepared and selected in the
+usual way. 
+
+HOW IT WORKS								     *
+
+RELATED WORKS								     *
+
+==============================================================================
+USAGE							*MotionComplete-usage*
+							     *i_CTRL-X_CTRL-M*
+CTRL-X CTRL-M		The completion first queries for {motion} (press
+			<Enter> to conclude), then finds matches starting with
+			the keyword before the cursor, covering {motion}. 
+							     *v_CTRL-X_CTRL-M*
+{Visual}CTRL-X CTRL-M	The completion first queries for {motion} (press
+			<Enter> to conclude), then finds matches starting with
+			the selected text, covering {motion}. 
+			Use this to define the completion base text (quickly
+			done from insert mode via [CTRL-]SHIFT-<Left>) for
+			better matches. 
+
+EXAMPLE						      *MotionComplete-example*
+A quick| ~
+       ^ cursor, just triggered motion completion. 
+
+(Somewhere else, a match:) 
+    v---v completion base
+The quick brown fox jumps over the lazy dog. ~
+    ^----------- "5w" --------^ completion via motion 5w
+
+==============================================================================
+INSTALLATION					 *MotionComplete-installation*
+
+This script is packaged as a |vimball|. If you have the "gunzip" decompressor
+in your PATH, simply edit the *.vba.gz package in Vim; otherwise, decompress
+the archive first, e.g. using WinZip. Inside Vim, install by sourcing the
+vimball or via the |:UseVimball| command. >
+    vim MotionComplete.vba.gz
+    :so %
+To uninstall, use the |:RmVimball| command. 
+
+DEPENDENCIES					 *MotionComplete-dependencies*
+
+- Requires Vim 7.0 or higher. 
+- Requires the CompleteHelper.vim plugin (vimscript #3914). 
+
+==============================================================================
+CONFIGURATION					*MotionComplete-configuration*
+
+For a permanent configuration, put the following commands into your |vimrc|: 
+
+		       *b:MotionComplete_complete* *g:MotionComplete_complete*
+Analoguous to the 'complete' option, you can specify which buffers will be
+scanned for completion candidates. Currently, only '.' (current buffer) and
+'w' (buffers from other windows) are supported. >
+    let g:MotionComplete_complete = '.,w'
+The global setting can be overridden for a particular buffer
+(b:MotionComplete_complete). 
+					   *g:MotionComplete_maxCaptureLength*
+To avoid that huge amounts of text are offered for completion, the maximum
+number of characters to be captured by {motion} is limited: >
+    let g:MotionComplete_maxCaptureLength = &columns * 3
+<					   *g:MotionComplete_searchScopeLines*
+To speed up the search and to avoid that many lines are offered for
+completion, the maximum number of lines to be searched for /pattern/ and
+?pattern? motions is limited: >
+    let g:MotionComplete_searchScopeLines = 5
+<
+==============================================================================
+INTEGRATION					  *MotionComplete-integration*
+
+==============================================================================
+LIMITATIONS					  *MotionComplete-limitations*
+
+KNOWN PROBLEMS				       *MotionComplete-known-problems*
+
+TODO							 *MotionComplete-todo*
+
+IDEAS							*MotionComplete-ideas*
+
+==============================================================================
+HISTORY						      *MotionComplete-history*
+
+1.00	02-Jan-2012
+First published version. 
+
+0.01	13-Aug-2008
+Started development. 
+
+==============================================================================
+Copyright: (C) 2008-2012 Ingo Karkat
+The VIM LICENSE applies to this script; see |copyright|. 
+
+Maintainer:	Ingo Karkat <ingo@karkat.de>
+==============================================================================
+ vim:tw=78:ts=8:ft=help:norl:
