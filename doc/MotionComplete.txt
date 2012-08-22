@@ -1,5 +1,4 @@
-*MotionComplete.txt*    Insert mode completion that completes a text chunk
-determined by {motion} or text object.
+*MotionComplete.txt*    Insert mode completion that completes a text chunk determined by {motion} or text object.
 
 		      MOTION COMPLETE    by Ingo Karkat
 							  *MotionComplete.vim*
