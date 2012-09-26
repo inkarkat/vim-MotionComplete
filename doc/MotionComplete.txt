@@ -33,6 +33,11 @@ SEE ALSO								     *
 
 ==============================================================================
 USAGE							*MotionComplete-usage*
+
+In insert mode, invoke the completion via CTRL-X CTRL-M and input the
+{motion}.
+You can then search forward and backward via CTRL-N / CTRL-P, as usual.
+
 							     *i_CTRL-X_CTRL-M*
 CTRL-X CTRL-M		The completion first queries for {motion} (press
 			<Enter> to conclude), then finds matches starting with
@@ -59,10 +64,10 @@ The quick brown fox jumps over the lazy dog. ~
 INSTALLATION					 *MotionComplete-installation*
 
 This script is packaged as a |vimball|. If you have the "gunzip" decompressor
-in your PATH, simply edit the *.vba.gz package in Vim; otherwise, decompress
+in your PATH, simply edit the *.vmb.gz package in Vim; otherwise, decompress
 the archive first, e.g. using WinZip. Inside Vim, install by sourcing the
 vimball or via the |:UseVimball| command. >
-    vim MotionComplete.vba.gz
+    vim MotionComplete*.vba.gz
     :so %
 To uninstall, use the |:RmVimball| command.
 
@@ -78,8 +83,8 @@ For a permanent configuration, put the following commands into your |vimrc|:
 
 		       *b:MotionComplete_complete* *g:MotionComplete_complete*
 Analoguous to the 'complete' option, you can specify which buffers will be
-scanned for completion candidates. Currently, only '.' (current buffer) and
-'w' (buffers from other windows) are supported. >
+scanned for completion candidates. Currently, '.' (current buffer), and 'w'
+(buffers from other windows) are supported. >
     let g:MotionComplete_complete = '.,w'
 The global setting can be overridden for a particular buffer
 (b:MotionComplete_complete).
