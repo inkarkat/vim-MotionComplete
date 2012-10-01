@@ -14,6 +14,9 @@
 "				selection rules to better handle text objects
 "				like "i)": Also allow non-keyword non-whitespace
 "				base. Allow whitespace before the cursor.
+"   			    	Change the way the functions are invoked to
+"				simplify and enable building additional mappings
+"				with a static motion.
 "	010	02-Jan-2012	Split off separate autoload script and
 "				documentation.
 "				Enable testing through more exposed functions.
@@ -158,18 +161,30 @@ endfunction
 function! MotionComplete#SetMotion( motion )
     let s:motion = a:motion
 endfunction
-function! MotionComplete#MotionInput(isSelectedBase)
+function! MotionComplete#Input( isSelectedBase )
+    " Need to set this first so that the correct base is used.
     call MotionComplete#SetSelectedBase(a:isSelectedBase)
 
     call inputsave()
-	call MotionComplete#SetMotion(input('Motion to complete from "' . s:GetBaseText() . '": '))
+	let l:motion = input('Motion to complete from "' . s:GetBaseText() . '": ')
     call inputrestore()
+
+    return l:motion
 endfunction
 
-function! MotionComplete#Expr()
-    call MotionComplete#MotionInput(0)
+function! MotionComplete#Expr( motion )
+    call MotionComplete#SetMotion(a:motion)
+    call MotionComplete#SetSelectedBase(0)
+
     set completefunc=MotionComplete#MotionComplete
     return "\<C-x>\<C-u>"
+endfunction
+function! MotionComplete#Selected( motion )
+    call MotionComplete#SetMotion(a:motion)
+    call MotionComplete#SetSelectedBase(1)
+
+    set completefunc=MotionComplete#MotionComplete
+    return "g`>" . (col("'>") == (col('$')) ? 'a' : 'i') . "\<C-x>\<C-u>"
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
