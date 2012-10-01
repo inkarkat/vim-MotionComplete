@@ -98,6 +98,14 @@ completion, the maximum number of lines to be searched for /pattern/ and
 ?pattern? motions is limited: >
     let g:MotionComplete_searchScopeLines = 5
 <
+							*MotionComplete-remap*
+If you want to use different mappings, map your keys to the
+<Plug>(MotionComplete) mapping targets _before_ sourcing the script (e.g.
+in your |vimrc|): >
+    imap <C-x><C-m> <Plug>(MotionComplete)
+    xmap <C-x><C-m> <Plug>(MotionComplete)
+    smap <C-x><C-m> <Plug>(MotionComplete)
+<
 ==============================================================================
 LIMITATIONS					  *MotionComplete-limitations*
 
