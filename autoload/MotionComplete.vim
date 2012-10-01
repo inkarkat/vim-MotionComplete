@@ -163,7 +163,7 @@ function! MotionComplete#SetMotion( motion )
     let s:motion = a:motion
 endfunction
 function! MotionComplete#MotionInput(isSelectedBase)
-    call MotionComplete#SetMotion(a:isSelectedBase)
+    call MotionComplete#SetSelectedBase(a:isSelectedBase)
 
     call inputsave()
     call MotionComplete#SetMotion(input('Motion to complete from "' . s:GetBaseText() . '": '))
