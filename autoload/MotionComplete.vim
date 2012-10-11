@@ -17,6 +17,11 @@
 "   			    	Change the way the functions are invoked to
 "				simplify and enable building additional mappings
 "				with a static motion.
+"				Refactoring: Replace s:isSelectedBase with
+"				s:selectedBase = [startCol, endCol] to enable
+"				additional mappings that set a particular base
+"				(like a custom motion "a)" that is always based
+"				off the starting "(").
 "	010	02-Jan-2012	Split off separate autoload script and
 "				documentation.
 "				Enable testing through more exposed functions.
@@ -108,23 +113,19 @@ function! MotionComplete#ExtractText( startPos, endPos, matchObj )
     return l:text
 endfunction
 function! s:LocateStartCol()
-    if s:isSelectedBase
+    if ! empty(s:selectedBase)
 	" User explicitly specified base via active selection.
-	let l:startCol = col("'<")
-    else
-	" Locate the start of the base before the cursor, according to
-	" |MotionComplete-base|.
-	let l:startCol = searchpos('\%(\k\+\|\k*\%(\k\@!\S\)\+\)\s*\%#', 'bn', line('.'))[1]
-	if l:startCol == 0
-	    let l:startCol = col('.')
-	endif
+	return s:selectedBase[0]
     endif
 
-    return l:startCol
+    " Locate the start of the base before the cursor, according to
+    " |MotionComplete-base|.
+    let l:startCol = searchpos('\%(\k\+\|\k*\%(\k\@!\S\)\+\)\s*\%#', 'bnW', line('.'))[1]
+    return (l:startCol == 0 ? col('.') : l:startCol)
 endfunction
 function! s:GetBaseText()
     let l:startCol = s:LocateStartCol()
-    return strpart(getline('.'), l:startCol - 1, (col((s:isSelectedBase ? "'>" : '.')) - l:startCol))
+    return strpart(getline('.'), l:startCol - 1, ((empty(s:selectedBase) ? col('.') : s:selectedBase[1]) - l:startCol))
 endfunction
 
 function! MotionComplete#MotionComplete( findstart, base )
@@ -148,22 +149,22 @@ function! MotionComplete#MotionComplete( findstart, base )
 	" must start at a word border, in case of a user-selected base, matches
 	" can start anywhere.
 	let l:matches = []
-	let l:pattern = '\V' . ((s:isSelectedBase || a:base !~# '^\k') && ! empty(a:base) ? '' : '\<') . escape(a:base, '\')
+	let l:pattern = '\V' . ((! empty(s:selectedBase) || a:base !~# '^\k') && ! empty(a:base) ? '' : '\<') . escape(a:base, '\')
 	call CompleteHelper#FindMatches( l:matches, l:pattern, l:options )
 	call map( l:matches, 'CompleteHelper#Abbreviate(v:val)')
 	return l:matches
     endif
 endfunction
 
-function! MotionComplete#SetSelectedBase( isSelectedBase )
-    let s:isSelectedBase = a:isSelectedBase
+function! MotionComplete#SetSelectedBase( selectedBase )
+    let s:selectedBase = a:selectedBase
 endfunction
 function! MotionComplete#SetMotion( motion )
     let s:motion = a:motion
 endfunction
-function! MotionComplete#Input( isSelectedBase )
+function! MotionComplete#Input( selectedBase )
     " Need to set this first so that the correct base is used.
-    call MotionComplete#SetSelectedBase(a:isSelectedBase)
+    call MotionComplete#SetSelectedBase(a:selectedBase)
 
     call inputsave()
 	let l:motion = input('Motion to complete from "' . s:GetBaseText() . '": ')
@@ -172,16 +173,19 @@ function! MotionComplete#Input( isSelectedBase )
     return l:motion
 endfunction
 
-function! MotionComplete#Expr( motion )
+function! MotionComplete#Expr( motion, ... )
     call MotionComplete#SetMotion(a:motion)
-    call MotionComplete#SetSelectedBase(0)
+    call MotionComplete#SetSelectedBase(a:0 ? a:1 : [])
 
     set completefunc=MotionComplete#MotionComplete
     return "\<C-x>\<C-u>"
 endfunction
+function! MotionComplete#GetVisualBase()
+    return [col("'<"), col("'>")]
+endfunction
 function! MotionComplete#Selected( motion )
     call MotionComplete#SetMotion(a:motion)
-    call MotionComplete#SetSelectedBase(1)
+    call MotionComplete#SetSelectedBase(MotionComplete#GetVisualBase())
 
     set completefunc=MotionComplete#MotionComplete
     return "g`>" . (col("'>") == (col('$')) ? 'a' : 'i') . "\<C-x>\<C-u>"
