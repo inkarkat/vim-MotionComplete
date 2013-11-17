@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - CompleteHelper.vim autoload script
 "
-" Copyright: (C) 2008-2012 Ingo Karkat
+" Copyright: (C) 2008-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -149,8 +149,8 @@ function! MotionComplete#MotionComplete( findstart, base )
 	" can start anywhere.
 	let l:matches = []
 	let l:pattern = '\V' . ((! empty(s:selectedBase) || a:base !~# '^\k') && ! empty(a:base) ? '' : '\<') . escape(a:base, '\')
-	call CompleteHelper#FindMatches( l:matches, l:pattern, l:options )
-	call map( l:matches, 'CompleteHelper#Abbreviate(v:val)')
+	call CompleteHelper#FindMatches(l:matches, l:pattern, l:options)
+	call map(l:matches, 'CompleteHelper#Abbreviate(v:val)')
 	return l:matches
     endif
 endfunction
