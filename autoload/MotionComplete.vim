@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - CompleteHelper.vim autoload script
+"   - ingo/register.vim autoload script
 "
 " Copyright: (C) 2008-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -9,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.01.012	18-Nov-2013	Use ingo#register#KeepRegisterExecuteOrFunc().
 "   1.00.011	02-Oct-2012	CHG: Rework and document completion base
 "				selection rules to better handle text objects
 "				like "i)": Also allow non-keyword non-whitespace
@@ -66,17 +68,16 @@ function! s:GetMotion( line )
 	return l:motionType . l:scopeLimit . strpart(s:motion, 1) . "\<CR>"
     endif
 endfunction
-function! s:CaptureText( matchObj )
-    " Capture a maximum number of characters; too many won't fit comfortably
-    " into the completion display, anyway.
-    if byteidx(@@, g:MotionComplete_maxCaptureLength + 1) == -1
-	return @@
-    else
-	" Add truncation note to match object.
-	let a:matchObj.menu = '(truncated)' . (! empty(get(a:matchObj, 'menu', '')) ? ', ' . a:matchObj.menu : '')
+function! MotionComplete#Yank( startPos, endPos )
+    " Position the cursor at the start of the match.
+    call setpos('.', [0, a:startPos[0], a:startPos[1], 0])
 
-	return strpart(@@, 0, byteidx(@@, g:MotionComplete_maxCaptureLength))
-    endif
+    " Yank with the supplied s:motion.
+    " No 'normal!' here, we want to allow user re-mappings and custom motions.
+    " 'silent!' is used to avoid the error beep in case s:motion is invalid.
+    let @" = ''
+    silent! execute 'normal y' . s:GetMotion(a:startPos[0])
+    return @"
 endfunction
 function! MotionComplete#ExtractText( startPos, endPos, matchObj )
     let l:save_cursor = getpos('.')
@@ -85,32 +86,21 @@ function! MotionComplete#ExtractText( startPos, endPos, matchObj )
     " folding temporarily.
     let l:save_foldenable = &l:foldenable
     let &l:foldenable = 0
-
-    let l:save_clipboard = &clipboard
-    set clipboard= " Avoid clobbering the selection and clipboard registers.
-
-    let l:save_reg = getreg('"')
-    let l:save_regmode = getregtype('"')
-    let @@ = ''
-
-	" Position the cursor at the start of the match.
-	call setpos('.', [0, a:startPos[0], a:startPos[1], 0])
-
-	" Yank with the supplied s:motion.
-	" No 'normal!' here, we want to allow user re-mappings and custom
-	" motions. 'silent!' is used to avoid the error beep in case s:motion is
-	" invalid.
-	silent! execute 'normal y' . s:GetMotion(a:startPos[0])
-
-	let l:text = s:CaptureText(a:matchObj)
-
-    call setreg('"', l:save_reg, l:save_regmode)
-    let &clipboard = l:save_clipboard
+	let l:text = ingo#register#KeepRegisterExecuteOrFunc(function('MotionComplete#Yank'), a:startPos, a:endPos)
     let &l:foldenable = l:save_foldenable
-    call setpos('.', l:save_cursor)
 
-    return l:text
+    " Capture a maximum number of characters; too many won't fit comfortably
+    " into the completion display, anyway.
+    if byteidx(l:text, g:MotionComplete_maxCaptureLength + 1) == -1
+	return l:text
+    else
+	" Add truncation note to match object.
+	let a:matchObj.menu = '(truncated)' . (! empty(get(a:matchObj, 'menu', '')) ? ', ' . a:matchObj.menu : '')
+
+	return strpart(l:text, 0, byteidx(l:text, g:MotionComplete_maxCaptureLength))
+    endif
 endfunction
+
 function! s:LocateStartCol()
     if ! empty(s:selectedBase)
 	" User explicitly specified base via active selection.
