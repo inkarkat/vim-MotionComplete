@@ -10,6 +10,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.01.013	20-Nov-2013	FIX: Accidentally removed restoring of cursor
+"				position during refactoring.
+"				Drop unused a:endPos argument.
 "   1.01.012	18-Nov-2013	Use ingo#register#KeepRegisterExecuteOrFunc().
 "   1.00.011	02-Oct-2012	CHG: Rework and document completion base
 "				selection rules to better handle text objects
@@ -68,7 +71,7 @@ function! s:GetMotion( line )
 	return l:motionType . l:scopeLimit . strpart(s:motion, 1) . "\<CR>"
     endif
 endfunction
-function! MotionComplete#Yank( startPos, endPos )
+function! MotionComplete#Yank( startPos )
     " Position the cursor at the start of the match.
     call setpos('.', [0, a:startPos[0], a:startPos[1], 0])
 
@@ -86,8 +89,9 @@ function! MotionComplete#ExtractText( startPos, endPos, matchObj )
     " folding temporarily.
     let l:save_foldenable = &l:foldenable
     let &l:foldenable = 0
-	let l:text = ingo#register#KeepRegisterExecuteOrFunc(function('MotionComplete#Yank'), a:startPos, a:endPos)
+	let l:text = ingo#register#KeepRegisterExecuteOrFunc(function('MotionComplete#Yank'), a:startPos)
     let &l:foldenable = l:save_foldenable
+    call setpos('.', l:save_cursor)
 
     " Capture a maximum number of characters; too many won't fit comfortably
     " into the completion display, anyway.
