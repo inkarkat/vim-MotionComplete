@@ -1,10 +1,10 @@
-" Test: Completion of multiple words from selected base. 
+" Test: Completion of multiple words from selected base.
 
 source ../helpers/completetest.vim
 call vimtest#StartTap()
-call vimtap#Plan(4) 
+call vimtap#Plan(4)
 edit MotionComplete.txt
-call MotionComplete#SetSelectedBase(1)
+call MotionComplete#SetSelectedBase(MotionComplete#GetVisualBase())
 
 set completefunc=MotionComplete#MotionComplete
 let g:isSelectBase = 1
