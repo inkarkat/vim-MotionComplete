@@ -2,14 +2,17 @@
 "
 " DEPENDENCIES:
 "   - CompleteHelper.vim autoload script
+"   - Complete/Abbreviate.vim autoload script
 "   - ingo/register.vim autoload script
 "
-" Copyright: (C) 2008-2013 Ingo Karkat
+" Copyright: (C) 2008-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.01.014	31-Mar-2014	Move away from deprecated
+"				CompleteHelper#Abbreviate().
 "   1.01.013	20-Nov-2013	FIX: Accidentally removed restoring of cursor
 "				position during refactoring.
 "				Drop unused a:endPos argument.
@@ -144,7 +147,7 @@ function! MotionComplete#MotionComplete( findstart, base )
 	let l:matches = []
 	let l:pattern = '\V' . ((! empty(s:selectedBase) || a:base !~# '^\k') && ! empty(a:base) ? '' : '\<') . escape(a:base, '\')
 	call CompleteHelper#FindMatches(l:matches, l:pattern, l:options)
-	call map(l:matches, 'CompleteHelper#Abbreviate(v:val)')
+	call map(l:matches, 'CompleteHelper#Abbreviate#Word(v:val)')
 	return l:matches
     endif
 endfunction
