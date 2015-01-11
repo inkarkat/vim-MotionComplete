@@ -1,5 +1,4 @@
-" MotionComplete.vim: Insert mode completion that completes a text chunk
-" determined by {motion} or text object.
+" MotionComplete.vim: Insert mode completion for chunks covered by queried {motion} or text object.
 "
 " DEPENDENCIES:
 "   - Requires Vim 7.0 or higher.
