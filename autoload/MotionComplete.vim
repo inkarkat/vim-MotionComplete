@@ -11,6 +11,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.01.015	18-Dec-2014	Use a:options.abbreviate instead of explicit
+"				abbreviation loop.
 "   1.01.014	31-Mar-2014	Move away from deprecated
 "				CompleteHelper#Abbreviate().
 "   1.01.013	20-Nov-2013	FIX: Accidentally removed restoring of cursor
@@ -128,7 +130,7 @@ function! MotionComplete#MotionComplete( findstart, base )
     if a:findstart
 	return s:LocateStartCol() - 1 " Return byte index, not column.
     else
-	let l:options = {}
+	let l:options = {'abbreviate': 1}
 	let l:options.complete = s:GetCompleteOption()
 	let l:options.extractor = function('MotionComplete#ExtractText')
 
@@ -147,7 +149,6 @@ function! MotionComplete#MotionComplete( findstart, base )
 	let l:matches = []
 	let l:pattern = '\V' . ((! empty(s:selectedBase) || a:base !~# '^\k') && ! empty(a:base) ? '' : '\<') . escape(a:base, '\')
 	call CompleteHelper#FindMatches(l:matches, l:pattern, l:options)
-	call map(l:matches, 'CompleteHelper#Abbreviate#Word(v:val)')
 	return l:matches
     endif
 endfunction
