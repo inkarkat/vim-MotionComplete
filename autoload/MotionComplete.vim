@@ -3,14 +3,18 @@
 " DEPENDENCIES:
 "   - CompleteHelper.vim autoload script
 "   - Complete/Abbreviate.vim autoload script
+"   - ingo/plugin/setting.vim autoload script
 "   - ingo/register.vim autoload script
 "
-" Copyright: (C) 2008-2014 Ingo Karkat
+" Copyright: (C) 2008-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.01.016	12-Jan-2015	Remove default g:MotionComplete_complete
+"				configuration and default to 'complete' option
+"				value instead.
 "   1.01.015	18-Dec-2014	Use a:options.abbreviate instead of explicit
 "				abbreviation loop.
 "   1.01.014	31-Mar-2014	Move away from deprecated
@@ -58,7 +62,7 @@
 "	001	13-Aug-2008	file creation
 
 function! s:GetCompleteOption()
-    return (exists('b:MotionComplete_complete') ? b:MotionComplete_complete : g:MotionComplete_complete)
+    return ingo#plugin#setting#GetBufferLocal('MotionComplete_complete', &complete)
 endfunction
 
 function! s:GetMotion( line )
