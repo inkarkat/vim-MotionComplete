@@ -92,15 +92,14 @@ function! MotionComplete#Yank( startPos )
     return @"
 endfunction
 function! MotionComplete#ExtractText( startPos, endPos, matchObj )
-    let l:save_cursor = getpos('.')
-
-    " Yanking in a closed fold would yield much additional text, so disable
-    " folding temporarily.
-    let l:save_foldenable = &l:foldenable
-    let &l:foldenable = 0
-	let l:text = ingo#register#KeepRegisterExecuteOrFunc(function('MotionComplete#Yank'), a:startPos)
-    let &l:foldenable = l:save_foldenable
-    call setpos('.', l:save_cursor)
+    let l:save_view = winsaveview()
+	" Yanking in a closed fold would yield much additional text, so disable
+	" folding temporarily.
+	let l:save_foldenable = &l:foldenable
+	let &l:foldenable = 0
+	    let l:text = ingo#register#KeepRegisterExecuteOrFunc(function('MotionComplete#Yank'), a:startPos)
+	let &l:foldenable = l:save_foldenable
+    call winrestview(l:save_view)
 
     " Capture a maximum number of characters; too many won't fit comfortably
     " into the completion display, anyway.
