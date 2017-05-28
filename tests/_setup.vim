@@ -1,3 +1,2 @@
 runtime plugin/MotionComplete.vim
-call MotionComplete#SetSelectedBase(0)
-
+call MotionComplete#SetSelectedBase([])
