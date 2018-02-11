@@ -1,8 +1,8 @@
-" Test: Completion of multiple words. 
+" Test: Completion of multiple words.
 
 source ../helpers/completetest.vim
 call vimtest#StartTap()
-call vimtap#Plan(6) 
+call vimtap#Plan(6)
 edit MotionComplete.txt
 
 set completefunc=MotionComplete#MotionComplete
