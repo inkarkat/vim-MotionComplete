@@ -1,8 +1,8 @@
-" Test: Completion of text objects. 
+" Test: Completion of text objects.
 
 source ../helpers/completetest.vim
 call vimtest#StartTap()
-call vimtap#Plan(3) 
+call vimtap#Plan(3)
 edit MotionComplete.txt
 
 set completefunc=MotionComplete#MotionComplete
