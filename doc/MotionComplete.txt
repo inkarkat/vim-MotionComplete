@@ -95,7 +95,7 @@ DEPENDENCIES					 *MotionComplete-dependencies*
 - Requires Vim 7.0 or higher.
 - Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.015 or
   higher.
-- Requires the |CompleteHelper.vim| plugin (vimscript #3914), version 1.50 or
+- Requires the |CompleteHelper.vim| plugin (vimscript #3914), version 1.51 or
   higher.
 
 ==============================================================================
@@ -104,12 +104,14 @@ CONFIGURATION					*MotionComplete-configuration*
 For a permanent configuration, put the following commands into your |vimrc|:
 
 		       *b:MotionComplete_complete* *g:MotionComplete_complete*
-Analoguous to the 'complete' option, you can specify which buffers will be
-scanned for completion candidates. Currently, '.' (current buffer), and 'w'
-(buffers from other windows) are supported. >
+By default, the 'complete' option controls which buffers will be scanned for
+completion candidates. You can override that either for the entire plugin, or
+only for particular buffers; see |CompleteHelper_complete| for supported
+values. >
     let g:MotionComplete_complete = '.,w'
-The global setting can be overridden for a particular buffer
-(b:MotionComplete_complete).
+Note that CompleteHelper.vim (in version 1.51 at least) does not support
+extraction from buffers not visible in the current tab page.
+
 					   *g:MotionComplete_maxCaptureLength*
 To avoid that huge amounts of text are offered for completion, the maximum
 number of characters to be captured by {motion} is limited: >
@@ -142,8 +144,9 @@ HISTORY						      *MotionComplete-history*
 
 1.01	RELEASEME
 - Use a:options.abbreviate instead of explicit abbreviation loop. *** You need
-  to update to CompleteHelper.vim (vimscript #3914) version 1.50! ***
-- Add dependency to ingo-library (vimscript #4433).
+  to update to CompleteHelper.vim (vimscript #3914) version 1.51! ***
+- Remove default g:MotionComplete_complete configuration and default to
+  'complete' option value instead.
 
 1.00	12-Oct-2012
 First published version.
@@ -152,7 +155,7 @@ First published version.
 Started development.
 
 ==============================================================================
-Copyright: (C) 2008-2014 Ingo Karkat
+Copyright: (C) 2008-2015 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
