@@ -1,6 +1,6 @@
 " Test: Completion of text objects.
 
-source ../helpers/completetest.vim
+runtime tests/helpers/completetest.vim
 call vimtest#StartTap()
 call vimtap#Plan(3)
 edit MotionComplete.txt
