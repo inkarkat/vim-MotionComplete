@@ -1,0 +1,68 @@
+It has been said that this is the first occurrence overall. 
+It has been said that this is the second occurrence for now. 
+It has been said that this is the second occurrence for now and never? 
+It has been said that this is the third occurrence this month. 
+It has been said that this is the last occurrence today. 
+
+Every absurdity has a champion to defend it. Every absurdity has a champion who will defend it. Every cloud has a silver lining; you should have sold it, and bought titanium.
+Every journalist has a novel in him, which is an excellent place for it. Every program is a part of some other program, and rarely fits. Every purchase has its price.
+Every silver lining has a cloud around it. Every solution breeds new problems.
+Everybody lies, but it doesn't matter since nobody listens.  -- Lieberman
+Everybody needs a little love sometime; stop hacking and fall in love!
+Everybody ought to have a friend.
+Everybody ought to have a maid.
+Everybody wants to go to heaven, but nobody wants to die.
+Everyone else my age is an adult, whereas I am merely in disguise.  -- Atwood
+Everyone is a genius.  It is just that some people are too stupid to realize it.
+Everyone is enthusiastic about your work.
+Everyone needs belief in something.  I believe I'll have another beer.
+Everything in moderation, including moderation.
+Everything is actually everything else, just recycled.
+Everything is always done for the wrong reasons.  -- O'Brian
+Everything put together falls apart sooner or later.  -- Simon
+Everything worthwhile is mandatory, prohibited, or taxed.
+Everything you know is wrong!
+Everything you know is wrong, but you can be straightened out.
+Everyting should be built top-down, except the first time. 
+
+This is not yet a long sentence. 
+This would be long because I fill in just some rubbish that makes it looonger. 
+This will be long, well, in case the previous sentence isn't looong enough already, here's some more padding text. 
+This will be long, well, in case the previous sentence isn't looong enough already, here's even more padding text than in the previous sentence. 
+This will be long, well, in case the previous sentence isn't looong enough already, here's even more padding text than in the previous sentence and the sentence before that, who started all this; phew, I'm now seriously running out of words! 
+This tries	to be long			by	inserting								a	whole	many	<Tab> characters. 
+
+lon
+"
+" DESCRIPTION: {{{1
+"   In order to achieve consistent indentation, you need to agree on the
+"   indentation width (e.g. 2, 4 or 8 spaces), and the indentation method (only
+"   tabs, only spaces, or a mix of tabs and spaces that minimizes the number of
+"   spaces and is called 'softtabstop' in VIM). Unfortunately, different people
+"   use different editors and cannot agree on "the right" width and method.
+"   Consistency is important, though, to make the text look the same in
+"   different editors and on printouts. If any editor inadvertently converts
+"   tabs and spaces, version control and diff'ing will be much harder to do. 
+"
+"   The IndentConsistencyCop examines the indent of the buffer and analyzes the
+"   used indent widths and methods. If there are (conflicting) ones or if bad
+"   combinations of tabs and spaces are found, it alerts you and offers help in
+"   locating the offenders - just like a friendly policeman: 
+"
+"   If the buffer (contents) are okay, the [IndentConsistencyCop] can evaluate
+"   whether VIM's buffer settings are compatible with the indent used in the
+"   buffer. The friendly cop offers to correct your buffer settings if you run
+"   the risk of screwing up the indent consistency with your wrong buffer
+"   settings: 
+"   The [IndentConsistencyCop] is only concerned with the amount of whitespace
+"   from column 1 to the first visible character; it does not check (e.g. the
+"   alignment) of tables, equals signs in variable assignments, etc. Neither does
+"   it know any specifics about programming languages, or your personal
+"   preferred indentation style. [IndentExampleStyle] 
+"  
+
+let l:startCol = searchpos('\k\+\%(\k\@!.\)*\%#', 'bn', line('.'))[1]
+    call searchpos( l:matches, '\V\<' . escape(a:base, '\'), l:options )
+
+This is a test of the emergency system!
+This is a te for the sake of it!
