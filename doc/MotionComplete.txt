@@ -93,7 +93,7 @@ To uninstall, use the |:RmVimball| command.
 DEPENDENCIES					 *MotionComplete-dependencies*
 
 - Requires Vim 7.0 or higher.
-- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.015 or
+- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.037 or
   higher.
 - Requires the |CompleteHelper.vim| plugin (vimscript #3914), version 1.51 or
   higher.
@@ -143,8 +143,9 @@ IDEAS							*MotionComplete-ideas*
 HISTORY						      *MotionComplete-history*
 
 1.01	RELEASEME
-- Use a:options.abbreviate instead of explicit abbreviation loop. *** You need
-  to update to CompleteHelper.vim (vimscript #3914) version 1.51! ***
+- Use a:options.abbreviate instead of explicit abbreviation loop.
+  *** You need to update to ingo-library (vimscript #4433) version 1.037! ***
+  *** You need to update to CompleteHelper.vim (vimscript #3914) version 1.51! ***
 - Remove default g:MotionComplete_complete configuration and default to
   'complete' option value instead.
 
@@ -155,7 +156,7 @@ First published version.
 Started development.
 
 ==============================================================================
-Copyright: (C) 2008-2015 Ingo Karkat
+Copyright: (C) 2008-2019 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
