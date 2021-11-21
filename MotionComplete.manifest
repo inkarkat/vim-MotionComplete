@@ -1,0 +1,3 @@
+autoload/MotionComplete.vim
+plugin/MotionComplete.vim
+doc/MotionComplete.txt
