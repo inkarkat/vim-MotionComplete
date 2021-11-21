@@ -4,12 +4,15 @@
 "   - Requires Vim 7.0 or higher.
 "   - MotionComplete.vim autoload script
 "
-" Copyright: (C) 2008-2012 Ingo Karkat
+" Copyright: (C) 2008-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.01.003	12-Jan-2015	Remove default g:MotionComplete_complete
+"				configuration and default to 'complete' option
+"				value instead.
 "   1.00.002	02-Oct-2012	Change the way the functions are invoked to
 "				simplify and enable building additional mappings
 "				with a static motion.
@@ -24,9 +27,6 @@ let g:loaded_MotionComplete = 1
 
 "- configuration ---------------------------------------------------------------
 
-if ! exists('g:MotionComplete_complete')
-    let g:MotionComplete_complete = '.,w'
-endif
 if ! exists('g:MotionComplete_maxCaptureLength')
     let g:MotionComplete_maxCaptureLength = &columns * 3
 endif
