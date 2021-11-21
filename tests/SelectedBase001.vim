@@ -1,6 +1,6 @@
 " Test: Completion of multiple words from selected base.
 
-source ../helpers/completetest.vim
+runtime tests/helpers/completetest.vim
 call vimtest#StartTap()
 call vimtap#Plan(4)
 edit MotionComplete.txt
