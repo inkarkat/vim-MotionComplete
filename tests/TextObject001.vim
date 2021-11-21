@@ -28,6 +28,8 @@ call IsMatchesInIsolatedLine('(e.g.', [
 call IsMatchesInIsolatedLine('spaces', [
 \   '(e.g. 2, 4 or 8 spaces)',
 \   "(only\n\"   tabs, only spaces, or a mix of tabs and spaces that minimizes the number of\n\"   spaces and is called 'softtabstop' in VIM)"
-\], 'text with keyword in brackets')
+\] + (v:version == 802 && has('patch3255') || v:version > 802 ? ['(conflicting)', '(contents)'] : []), 'text with keyword in brackets')
+" Vim 8.2.3255 fixes "ci\" finds following string but ci< and others don't", so
+" the a) text object will also locate the other bracketed words.
 
 call vimtest#Quit()
