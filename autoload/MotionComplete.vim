@@ -6,12 +6,13 @@
 "   - ingo/plugin/setting.vim autoload script
 "   - ingo/register.vim autoload script
 "
-" Copyright: (C) 2008-2015 Ingo Karkat
+" Copyright: (C) 2008-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.01.017	01-Apr-2019	Refactoring: Use ingo#pos#Make4().
 "   1.01.016	12-Jan-2015	Remove default g:MotionComplete_complete
 "				configuration and default to 'complete' option
 "				value instead.
@@ -82,7 +83,7 @@ function! s:GetMotion( line )
 endfunction
 function! MotionComplete#Yank( startPos )
     " Position the cursor at the start of the match.
-    call setpos('.', [0, a:startPos[0], a:startPos[1], 0])
+    call setpos('.', ingo#pos#Make4(a:startPos))
 
     " Yank with the supplied s:motion.
     " No 'normal!' here, we want to allow user re-mappings and custom motions.
